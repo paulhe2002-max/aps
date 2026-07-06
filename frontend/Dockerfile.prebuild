@@ -1,5 +1,6 @@
-# 预编译模式：本地先执行 npm install && npm run build，Docker 直接打包 dist
-FROM registry.cn-hangzhou.aliyuncs.com/library/nginx:alpine
+# 预编译模式：本地已有的 forecast_claude-frontend（内含 nginx）
+# 使用前先在本地执行: npm install && npm run build
+FROM forecast_claude-frontend:latest
 
 COPY dist/ /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/conf.d/default.conf

@@ -1,9 +1,9 @@
-FROM registry.cn-hangzhou.aliyuncs.com/library/python:3.11-slim
+# 直接用本地已有的 aps_claude-backend（内含 Python 环境）
+FROM aps_claude-backend:latest
 
 WORKDIR /app
 
 COPY requirements.txt .
-
 RUN pip install --no-cache-dir \
     -i https://mirrors.aliyun.com/pypi/simple/ \
     --trusted-host mirrors.aliyun.com \
