@@ -895,7 +895,7 @@ def _sheet_aco(wb):
     row += 1
     ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=10)
     nc = ws.cell(row=row, column=1,
-        value="注：信息素值越大（绿色高亮）表示蚂蚁更倾向将该工单分配到对应产线，即算法"学到"的最优分配策略")
+        value="注：信息素值越大（绿色高亮）表示蚂蚁更倾向将该工单分配到对应产线，即算法[学到]的最优分配策略")
     nc.font = Font(italic=True, size=9, color=C_HEADER)
     nc.alignment = Alignment(horizontal="left", vertical="center")
     nc.fill = PatternFill("solid", fgColor="DEEAF1")
