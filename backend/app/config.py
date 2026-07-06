@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     DB_PORT: int = 3306
     DB_USER: str = "aps_user"
     DB_PASSWORD: str = "aps_password"
-    DB_NAME: str = "aps_db"
+    DB_NAME: str = "aps_db_1"
     SECRET_KEY: str = "aps-secret-key-change-in-production-2024"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480

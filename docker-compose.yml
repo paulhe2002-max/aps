@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: aps_db
+      MYSQL_DATABASE: aps_db_1
       MYSQL_USER: aps_user
       MYSQL_PASSWORD: aps_password
     ports:
@@ -27,7 +27,7 @@ services:
       DB_PORT: 3306
       DB_USER: aps_user
       DB_PASSWORD: aps_password
-      DB_NAME: aps_db
+      DB_NAME: aps_db_1
     depends_on:
       mysql:
         condition: service_healthy
