@@ -9,6 +9,7 @@ from app.production.api.router import router as production_router
 from app.planning.api.router import router as planning_router
 from app.scheduling.api.router import router as scheduling_router
 from app.reports.api.router import router as reports_router
+from app.export.router import router as export_router
 
 app = FastAPI(title="APS - Advanced Planning & Scheduling", version="1.0.0")
 
@@ -28,6 +29,7 @@ app.include_router(production_router, prefix="/api")
 app.include_router(planning_router, prefix="/api")
 app.include_router(scheduling_router, prefix="/api")
 app.include_router(reports_router, prefix="/api")
+app.include_router(export_router, prefix="/api")
 
 
 @app.on_event("startup")

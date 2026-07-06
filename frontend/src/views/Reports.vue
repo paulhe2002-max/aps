@@ -108,15 +108,25 @@
       </el-tab-pane>
     </el-tabs>
 
-    <el-button type="primary" @click="loadAll" icon="Refresh" style="position:fixed;bottom:30px;right:30px">
-      刷新数据
-    </el-button>
+    <!-- Fixed action buttons -->
+    <div style="position:fixed;bottom:30px;right:30px;display:flex;gap:10px;flex-direction:column;align-items:flex-end">
+      <el-button type="success" icon="Download" @click="downloadUserManual" :loading="dlManual">
+        下载用户操作手册
+      </el-button>
+      <el-button type="warning" icon="Download" @click="downloadAlgoDemo" :loading="dlAlgo">
+        下载算法演示手册
+      </el-button>
+      <el-button type="primary" @click="loadAll" icon="Refresh">
+        刷新数据
+      </el-button>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { reportsApi } from '../api'
+import axios from 'axios'
 
 const tab = ref('inventory')
 const inventoryData = ref([])
@@ -140,4 +150,33 @@ async function loadAll() {
 }
 
 onMounted(loadAll)
+
+const dlManual = ref(false)
+const dlAlgo   = ref(false)
+
+async function downloadFile(url, filename, loadingRef) {
+  loadingRef.value = true
+  try {
+    const token = localStorage.getItem('token')
+    const resp = await axios.get(url, {
+      responseType: 'blob',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    const href = URL.createObjectURL(resp.data)
+    const a = document.createElement('a')
+    a.href = href
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(href)
+  } finally {
+    loadingRef.value = false
+  }
+}
+
+function downloadUserManual() {
+  downloadFile('/api/export/user-manual', 'APS_用户操作手册.xlsx', dlManual)
+}
+function downloadAlgoDemo() {
+  downloadFile('/api/export/algorithm-demo', 'APS_算法逐步演示.xlsx', dlAlgo)
+}
 </script>
