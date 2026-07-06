@@ -1,0 +1,6 @@
+# 使用预编译好的 dist 目录，无需 npm install
+# 使用前先在本地执行: npm install && npm run build
+FROM nginx:alpine
+COPY dist/ /usr/share/nginx/html/
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 7000

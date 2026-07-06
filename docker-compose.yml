@@ -35,7 +35,12 @@ services:
       - ./backend:/app
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      # 如果 npm install 太慢，改用预编译方式:
+      #   1. 先在 frontend 目录执行: npm install && npm run build
+      #   2. 把下面 dockerfile 改为 Dockerfile.prebuild
+      dockerfile: Dockerfile
     ports:
       - "7000:7000"
     depends_on:

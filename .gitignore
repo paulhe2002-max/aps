@@ -9,8 +9,8 @@ venv/
 
 # Node
 node_modules/
-dist/
 .npm/
+# dist/ 不忽略，供 Dockerfile.prebuild 使用
 
 # DB
 *.sqlite3
