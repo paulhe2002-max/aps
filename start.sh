@@ -16,7 +16,7 @@ pip install -r requirements.txt -q
 
 python seed_demo.py
 
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
+uvicorn app.main:app --host 0.0.0.0 --port 9000 --reload &
 BACKEND_PID=$!
 echo "后端启动 PID=$BACKEND_PID"
 
@@ -30,9 +30,9 @@ echo "前端启动 PID=$FRONTEND_PID"
 echo ""
 echo "====================================="
 echo "APS系统已启动"
-echo "前端: http://localhost:5173"
-echo "后端API: http://localhost:8000"
-echo "API文档: http://localhost:8000/docs"
+echo "前端: http://localhost:7000"
+echo "后端API: http://localhost:9000"
+echo "API文档: http://localhost:9000/docs"
 echo "默认账户: admin / admin123"
 echo "====================================="
 
