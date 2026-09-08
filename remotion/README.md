@@ -99,7 +99,7 @@ remotion.config.ts      渲染配置
 `backend/Dockerfile` 已改造为支持视频渲染，`docker-compose.yml` 的 backend
 构建上下文改为仓库根目录，会把本工程一并打进后端镜像：
 
-1. 从官方 `node:22` 镜像拷贝 Node.js；
+1. 通过 NodeSource 安装 Node.js 22（按基础镜像的 Debian 版本构建，避免 glibc 不匹配）；
 2. 安装 Chrome Headless Shell 运行所需的系统库 **及中文字体**（`fonts-noto-cjk`，
    否则视频中文显示为方块）；
 3. 在 `/remotion` 执行 `npm ci` 并 `npx remotion browser ensure` 预置浏览器；
@@ -111,8 +111,8 @@ docker compose up -d --build
 ```
 
 注意事项：
-- 基础镜像 `aps_claude-backend` 假定为 **Debian/apt** 体系；若为 Alpine，请把
-  Dockerfile 中的 `apt-get` 段换成 `apk` 等价依赖，Node 拷贝也需用 musl 版本。
+- 基础镜像 `aps_claude-backend` 为 **Debian/apt** 体系（已确认）；Node 经 NodeSource
+  安装，兼容 bullseye/bookworm。
 - `npx remotion browser ensure` 需在**构建期**访问 `remotion.media` 下载浏览器；
   若构建网络受限，可改为在镜像内提供 Chrome Headless Shell 并设置
   `REMOTION_BROWSER_EXECUTABLE` 指向它。

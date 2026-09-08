@@ -4,28 +4,26 @@
 FROM aps_claude-backend:latest
 
 # ---------------------------------------------------------------------------
-# 1) Node.js —— Remotion 渲染需要（从官方 node 镜像拷贝，避免额外安装源）
-# ---------------------------------------------------------------------------
-COPY --from=node:22-bookworm-slim /usr/local/bin/node /usr/local/bin/node
-COPY --from=node:22-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
- && ln -sf /usr/local/lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
- && node --version && npm --version
-
-# ---------------------------------------------------------------------------
-# 2) Chrome Headless Shell 运行所需的系统库 + 中文字体（否则中文显示为方块）
-#    如基础镜像非 Debian/apt 体系，请改用对应包管理器安装等价依赖。
+# 1) Node.js（Remotion 渲染需要）+ Chrome Headless Shell 运行所需的系统库
+#    与中文字体（否则视频中文显示为方块）。
+#    Node 通过 NodeSource 安装：会针对基础镜像的 Debian 版本（bullseye/bookworm）
+#    构建，比从其它镜像拷贝二进制更稳妥（避免 glibc 版本不匹配）。
 # ---------------------------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      ca-certificates fonts-liberation fonts-noto-cjk \
+      ca-certificates curl gnupg \
+ && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+ && apt-get install -y --no-install-recommends nodejs \
+ && apt-get install -y --no-install-recommends \
+      fonts-liberation fonts-noto-cjk \
       libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 \
       libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 \
       libgbm1 libasound2 libpango-1.0-0 libcairo2 libatspi2.0-0 \
       libx11-6 libxcb1 libxext6 libxi6 libglib2.0-0 \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && node --version && npm --version
 
 # ---------------------------------------------------------------------------
-# 3) Python 依赖
+# 2) Python 依赖
 # ---------------------------------------------------------------------------
 WORKDIR /app
 COPY backend/requirements.txt .
@@ -35,7 +33,7 @@ RUN pip install --no-cache-dir \
     -r requirements.txt
 
 # ---------------------------------------------------------------------------
-# 4) Remotion 工程：安装依赖并预置 Chrome Headless Shell（构建期下载进镜像，
+# 3) Remotion 工程：安装依赖并预置 Chrome Headless Shell（构建期下载进镜像，
 #    运行期即可离线渲染）。REMOTION_DIR 指向该目录供后端调用。
 # ---------------------------------------------------------------------------
 WORKDIR /remotion
@@ -46,7 +44,7 @@ RUN npx remotion browser ensure
 ENV REMOTION_DIR=/remotion
 
 # ---------------------------------------------------------------------------
-# 5) 后端源码
+# 4) 后端源码
 # ---------------------------------------------------------------------------
 WORKDIR /app
 COPY backend/ .
