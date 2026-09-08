@@ -4,7 +4,9 @@
   "description": "Remotion video project for the APS system",
   "scripts": {
     "dev": "remotion studio",
-    "render": "remotion render",
+    "render": "remotion render ApsReport out/aps-report.mp4",
+    "fetch-data": "node fetch-aps-data.mjs",
+    "render:file": "remotion render ApsReport out/aps-report.mp4 --props=out/aps-data.json",
     "upgrade": "remotion upgrade"
   },
   "dependencies": {
