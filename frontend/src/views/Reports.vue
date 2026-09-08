@@ -129,7 +129,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import { reportsApi } from '../api'
+import { reportsApi, exportApi } from '../api'
 import axios from 'axios'
 
 const tab = ref('inventory')
@@ -185,14 +185,31 @@ function downloadAlgoDemo() {
   downloadFile('/api/export/algorithm-demo', 'APS_算法逐步演示.xlsx', dlAlgo)
 }
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
+
 async function downloadVideoReport() {
   dlVideo.value = true
-  ElMessage.info('正在读取最新数据并渲染视频，请稍候（约需 30 秒~几分钟）…')
   try {
+    // 1) Start the render job (returns immediately).
+    const { data: job } = await exportApi.startVideoReport()
+    ElMessage.info('已开始渲染视频，正在后台生成，请稍候…')
+
+    // 2) Poll the job status until it finishes or errors (max ~15 min).
+    const deadline = Date.now() + 15 * 60 * 1000
+    let status = job
+    while (status.status !== 'done' && status.status !== 'error') {
+      if (Date.now() > deadline) throw new Error('视频渲染超时')
+      await sleep(3000)
+      status = (await exportApi.videoReportStatus(job.job_id)).data
+    }
+    if (status.status === 'error') {
+      throw new Error(status.error || '视频渲染失败')
+    }
+
+    // 3) Download the finished file (authorized blob request).
     const token = localStorage.getItem('token')
-    const resp = await axios.get('/api/export/video-report', {
+    const resp = await axios.get(exportApi.videoReportDownloadUrl(job.job_id), {
       responseType: 'blob',
-      timeout: 15 * 60 * 1000, // rendering can take a while
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
     const href = URL.createObjectURL(resp.data)
@@ -203,14 +220,15 @@ async function downloadVideoReport() {
     URL.revokeObjectURL(href)
     ElMessage.success('视频报告已生成')
   } catch (err) {
-    // Error responses come back as a blob; try to surface the JSON detail.
-    let msg = '视频生成失败'
+    let msg = err?.message || '视频生成失败'
     const data = err?.response?.data
     if (data instanceof Blob) {
       try {
         const parsed = JSON.parse(await data.text())
         if (parsed.detail) msg = parsed.detail
       } catch {}
+    } else if (data?.detail) {
+      msg = data.detail
     }
     ElMessage.error(msg)
   } finally {

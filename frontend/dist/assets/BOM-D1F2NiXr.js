@@ -1,4 +1,4 @@
-import{l as X,o as c,c as G,b as l,w as a,e as n,r as m,f as p,t as P,d as Y,a as B,g as z,x as Z,F as h,m as ee,j as le,v as te,E as V}from"./index-CAKCyPtg.js";import{p as v}from"./index-CtsIdvDw.js";const ae={style:{display:"flex","justify-content":"space-between","align-items":"center"}},oe={style:{display:"flex","justify-content":"space-between","align-items":"center"}},de={key:0,style:{"margin-top":"20px"}},se={__name:"BOM",setup(ne){const I={name:"BomTreeNode",props:["node"],template:`
+import{l as X,o as c,c as G,b as l,w as a,e as n,r as m,f as p,t as P,d as Y,a as B,g as z,x as Z,F as h,m as ee,j as le,v as te,E as V}from"./index-Dtlb51os.js";import{p as v}from"./index-_bJmnUb8.js";const ae={style:{display:"flex","justify-content":"space-between","align-items":"center"}},oe={style:{display:"flex","justify-content":"space-between","align-items":"center"}},de={key:0,style:{"margin-top":"20px"}},se={__name:"BOM",setup(ne){const I={name:"BomTreeNode",props:["node"],template:`
     <div style="margin-left:16px">
       <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
         <span style="color:#409eff">{{ node.product?.code }}</span>

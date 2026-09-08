@@ -53,8 +53,17 @@ npm run render:file    # 用该 JSON 作为 props 离线渲染
 
 ### 方式 C：后端「一键生成」接口（推荐给最终用户）
 
-后端提供了 `GET /api/export/video-report` 接口（在报表页有「一键生成视频报告」按钮）。
-它直接从数据库组装数据，写入临时 `--props` 文件后调用本工程渲染，并把 MP4 返回下载。
+报表页的「一键生成视频报告」按钮，后端提供两套接口：
+
+**同步接口**（简单，会阻塞到渲染完成）
+- `GET /api/export/video-report` → 直接返回 MP4
+
+**异步接口（推荐，前端按钮实际使用）** —— 渲染较慢，避免长时间阻塞请求：
+- `POST /api/export/video-report/jobs` → 立即返回 `{job_id, status}`
+- `GET  /api/export/video-report/jobs/{job_id}` → 轮询状态 `pending|running|done|error`
+- `GET  /api/export/video-report/jobs/{job_id}/download` → 渲染完成后下载 MP4
+
+以上接口都直接从数据库组装数据，写入临时 `--props` 文件后调用本工程渲染。
 
 - 该接口通过 `REMOTION_APS_SKIP_FETCH=1` 让 composition **直接使用后端传入的数据**，
   不再回调 API（无需二次登录）。

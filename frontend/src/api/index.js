@@ -92,6 +92,15 @@ export const schedulingApi = {
   simulate: (algorithm) => api.get(`/scheduling/simulation/${algorithm}`),
 }
 
+export const exportApi = {
+  startVideoReport: (scheduleId) =>
+    api.post('/export/video-report/jobs', null, {
+      params: scheduleId != null ? { schedule_id: scheduleId } : {},
+    }),
+  videoReportStatus: (jobId) => api.get(`/export/video-report/jobs/${jobId}`),
+  videoReportDownloadUrl: (jobId) => `/api/export/video-report/jobs/${jobId}/download`,
+}
+
 export const reportsApi = {
   dashboard: () => api.get('/reports/dashboard'),
   inventoryHealth: () => api.get('/reports/inventory-health'),
