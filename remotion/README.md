@@ -94,6 +94,31 @@ fetch-aps-data.mjs      离线取数脚本
 remotion.config.ts      渲染配置
 ```
 
+## Docker 部署（已打通）
+
+`backend/Dockerfile` 已改造为支持视频渲染，`docker-compose.yml` 的 backend
+构建上下文改为仓库根目录，会把本工程一并打进后端镜像：
+
+1. 从官方 `node:22` 镜像拷贝 Node.js；
+2. 安装 Chrome Headless Shell 运行所需的系统库 **及中文字体**（`fonts-noto-cjk`，
+   否则视频中文显示为方块）；
+3. 在 `/remotion` 执行 `npm ci` 并 `npx remotion browser ensure` 预置浏览器；
+4. 设置 `REMOTION_DIR=/remotion`，后端接口即可直接渲染。
+
+```bash
+docker compose up -d --build
+# 报表页点击「一键生成视频报告」即可
+```
+
+注意事项：
+- 基础镜像 `aps_claude-backend` 假定为 **Debian/apt** 体系；若为 Alpine，请把
+  Dockerfile 中的 `apt-get` 段换成 `apk` 等价依赖，Node 拷贝也需用 musl 版本。
+- `npx remotion browser ensure` 需在**构建期**访问 `remotion.media` 下载浏览器；
+  若构建网络受限，可改为在镜像内提供 Chrome Headless Shell 并设置
+  `REMOTION_BROWSER_EXECUTABLE` 指向它。
+- 不要把宿主机的 `remotion/node_modules` 挂载/复制进容器（已用根目录
+  `.dockerignore` 排除），以免覆盖镜像内为容器平台安装的依赖。
+
 ## 系统依赖
 
 渲染时 Remotion 依赖 FFmpeg（新版本已内置），若系统缺少 Chrome/Chromium，

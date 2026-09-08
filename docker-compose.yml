@@ -19,7 +19,10 @@ services:
       retries: 5
 
   backend:
-    build: ./backend
+    build:
+      # 上下文为仓库根目录，使镜像能同时包含 backend/ 与 remotion/（视频渲染）
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "9000:9000"
     environment:
@@ -28,10 +31,13 @@ services:
       DB_USER: aps_user
       DB_PASSWORD: aps_password
       DB_NAME: aps_db_1
+      # Remotion 视频工程目录（镜像内已 npm ci 并预置浏览器）
+      REMOTION_DIR: /remotion
     depends_on:
       mysql:
         condition: service_healthy
     volumes:
+      # 仅挂载源码用于热重载；不要挂载 /remotion，避免覆盖镜像内已装的 node_modules
       - ./backend:/app
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9000/api/health')"]

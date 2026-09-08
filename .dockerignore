@@ -1,0 +1,11 @@
+# Keep the backend build context (repo root) lean and avoid clobbering
+# image-installed dependencies with host copies.
+.git
+**/node_modules
+remotion/out
+frontend/node_modules
+**/__pycache__
+*.pyc
+.venv
+venv
+.DS_Store
