@@ -2,15 +2,14 @@ import { ApsReportData, FulfillmentRow, ScheduleDetail } from "./types";
 import { SAMPLE_DATA } from "./sample";
 
 // Configure where the APS backend lives and which account to use.
-// Override at render time, e.g.:
-//   APS_API_BASE=http://localhost:9000/api APS_USER=admin APS_PASSWORD=admin123 npm run render
-const API_BASE =
-  (typeof process !== "undefined" && process.env?.APS_API_BASE) ||
-  "http://localhost:9000/api";
-const USERNAME =
-  (typeof process !== "undefined" && process.env?.APS_USER) || "admin";
-const PASSWORD =
-  (typeof process !== "undefined" && process.env?.APS_PASSWORD) || "admin123";
+// Remotion only injects env vars prefixed with REMOTION_ into the bundle, so
+// overrides must use that prefix, e.g.:
+//   REMOTION_APS_API_BASE=http://localhost:9000/api \
+//   REMOTION_APS_USER=admin REMOTION_APS_PASSWORD=admin123 npm run render
+const env = (typeof process !== "undefined" && process.env) || {};
+const API_BASE = env.REMOTION_APS_API_BASE || "http://localhost:9000/api";
+const USERNAME = env.REMOTION_APS_USER || "admin";
+const PASSWORD = env.REMOTION_APS_PASSWORD || "admin123";
 
 async function login(): Promise<string> {
   const body = new URLSearchParams({ username: USERNAME, password: PASSWORD });

@@ -51,6 +51,22 @@ npm run fetch-data     # 抓取后端数据 -> out/aps-data.json
 npm run render:file    # 用该 JSON 作为 props 离线渲染
 ```
 
+### 方式 C：后端「一键生成」接口（推荐给最终用户）
+
+后端提供了 `GET /api/export/video-report` 接口（在报表页有「一键生成视频报告」按钮）。
+它直接从数据库组装数据，写入临时 `--props` 文件后调用本工程渲染，并把 MP4 返回下载。
+
+- 该接口通过 `REMOTION_APS_SKIP_FETCH=1` 让 composition **直接使用后端传入的数据**，
+  不再回调 API（无需二次登录）。
+- 服务器需安装 Node.js，并在 `remotion/` 执行过 `npm install`。
+- 相关环境变量（后端读取）：
+  - `REMOTION_DIR`：Remotion 工程目录（默认自动定位到仓库内 `remotion/`）
+  - `REMOTION_BROWSER_EXECUTABLE`：Chrome Headless Shell 路径（受限网络下必填）
+  - `REMOTION_RENDER_TIMEOUT`：渲染超时秒数（默认 600）
+
+> Remotion 只会把以 `REMOTION_` 开头的环境变量注入到 bundle 中，因此上面这些
+> 传给 composition 的变量都带 `REMOTION_` 前缀。
+
 ## 目录结构
 
 ```

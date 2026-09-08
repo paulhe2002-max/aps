@@ -110,6 +110,9 @@
 
     <!-- Fixed action buttons -->
     <div style="position:fixed;bottom:30px;right:30px;display:flex;gap:10px;flex-direction:column;align-items:flex-end">
+      <el-button type="danger" icon="VideoCamera" @click="downloadVideoReport" :loading="dlVideo">
+        {{ dlVideo ? '视频生成中…' : '一键生成视频报告' }}
+      </el-button>
       <el-button type="success" icon="Download" @click="downloadUserManual" :loading="dlManual">
         下载用户操作手册
       </el-button>
@@ -125,6 +128,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { reportsApi } from '../api'
 import axios from 'axios'
 
@@ -153,6 +157,7 @@ onMounted(loadAll)
 
 const dlManual = ref(false)
 const dlAlgo   = ref(false)
+const dlVideo  = ref(false)
 
 async function downloadFile(url, filename, loadingRef) {
   loadingRef.value = true
@@ -178,5 +183,38 @@ function downloadUserManual() {
 }
 function downloadAlgoDemo() {
   downloadFile('/api/export/algorithm-demo', 'APS_算法逐步演示.xlsx', dlAlgo)
+}
+
+async function downloadVideoReport() {
+  dlVideo.value = true
+  ElMessage.info('正在读取最新数据并渲染视频，请稍候（约需 30 秒~几分钟）…')
+  try {
+    const token = localStorage.getItem('token')
+    const resp = await axios.get('/api/export/video-report', {
+      responseType: 'blob',
+      timeout: 15 * 60 * 1000, // rendering can take a while
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    const href = URL.createObjectURL(resp.data)
+    const a = document.createElement('a')
+    a.href = href
+    a.download = `APS_视频报告_${new Date().toISOString().slice(0, 10)}.mp4`
+    a.click()
+    URL.revokeObjectURL(href)
+    ElMessage.success('视频报告已生成')
+  } catch (err) {
+    // Error responses come back as a blob; try to surface the JSON detail.
+    let msg = '视频生成失败'
+    const data = err?.response?.data
+    if (data instanceof Blob) {
+      try {
+        const parsed = JSON.parse(await data.text())
+        if (parsed.detail) msg = parsed.detail
+      } catch {}
+    }
+    ElMessage.error(msg)
+  } finally {
+    dlVideo.value = false
+  }
 }
 </script>

@@ -19,8 +19,16 @@ export const RemotionRoot: React.FC = () => {
         width={1920}
         height={1080}
         defaultProps={{ data: SAMPLE_DATA }}
-        calculateMetadata={async () => {
-          const data = await fetchApsData();
+        calculateMetadata={async ({ props }) => {
+          // When the caller supplies data via input props (e.g. the backend
+          // "one-click" endpoint sets REMOTION_APS_SKIP_FETCH=1 and passes
+          // --props), use it as-is. Otherwise pull live data from the backend.
+          // Note: Remotion only exposes env vars prefixed with REMOTION_ to the
+          // bundle, so the flag must carry that prefix.
+          const skipFetch =
+            typeof process !== "undefined" &&
+            process.env?.REMOTION_APS_SKIP_FETCH === "1";
+          const data = skipFetch ? props.data : await fetchApsData();
           return {
             props: { data },
             durationInFrames: totalDurationInFrames(FPS),
