@@ -2,11 +2,17 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from app.config import settings
 
+_db_url = settings.DATABASE_URL
+# SQLite (used for local runs without MySQL) needs check_same_thread disabled
+# so the connection can be shared across FastAPI's worker threads.
+_connect_args = {"check_same_thread": False} if _db_url.startswith("sqlite") else {}
+
 engine = create_engine(
-    settings.DATABASE_URL,
+    _db_url,
     pool_pre_ping=True,
     pool_recycle=3600,
     echo=False,
+    connect_args=_connect_args,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
